@@ -1,0 +1,330 @@
+
+
+<?php include("includes/header.php"); ?>
+
+ <script>
+
+            $(document).ready(function(){
+			 $('#lease_start_date').Zebra_DatePicker();
+			  $('#lease_end_date').Zebra_DatePicker();
+
+    $('#dob').Zebra_DatePicker({
+
+     // remember that the way you write down dates
+
+     // depends on the value of the "format" property!
+
+      view: 'years'
+
+    });
+
+    //* validation
+
+    $('#stockinmaster').validate({
+
+     onkeyup: false,
+
+     errorClass: 'error',
+
+     validClass: 'valid',
+
+     rules: {
+
+      materialId: { required: true},
+      
+	  vendorId:{ required: true},
+
+      quantity:{required: true},
+
+      cost:{required: true,number:true,},
+
+      storageLoc:{required: true},
+
+
+      
+
+     },
+
+     highlight: function(element) {
+
+      $(element).closest('div').addClass("f_error");
+
+      setTimeout(function() {
+
+       boxHeight()
+
+      }, 200)
+
+     },
+
+     unhighlight: function(element) {
+
+      $(element).closest('div').removeClass("f_error");
+
+      setTimeout(function() {
+
+       boxHeight()
+
+      }, 200)
+
+     }
+
+    });
+
+            });
+
+        </script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+		
+                $('#materialId').change(function () {
+                    var materialId = $(this).attr('value');
+                    console.log(materialId);
+                    $.ajax({   
+                        url: "<?php echo base_url(); ?>ajax/materialCost/"+materialId, //The url where the server req would we made.
+                        async: false,
+                        type: "GET", //The type which you want to use: GET/POST
+                        dataType: "html", //Return data type (what we expect).
+                         
+                        //This is the function which will be called if ajax call is successful.
+                        success: function(data) {
+			var d=data;
+			var myArray = d.split(',');
+		for(var i=0;i<myArray.length;i++){
+
+		if(i==0){
+
+
+			$('#cost').val(myArray[i]);
+}
+else{
+		
+		$('#balance').val(myArray[i]);
+
+}
+    }
+			
+			}
+                    })
+	 
+});
+		
+            });
+        </script>
+
+
+
+            <!-- main content -->
+            <div id="contentwrapper">
+                <div class="main_content">
+                    
+                    <nav>
+                        <div id="jCrumbs" class="breadCrumb module">
+                            <ul>
+                                <li>
+                                    <a href="#"><i class="icon-home"></i></a>
+                                </li>
+                                <li>
+                                    <h3 style="color:#39c">Stock IN</h3>
+                                </li>
+                                     </ul>
+                        </div>
+                    </nav>
+<?php 
+     
+                    if ($this->session->flashdata('registrationmessage') != ''){
+      echo '<div class="box_error">';
+                      echo $this->session->flashdata('registrationmessage'); 
+                     echo '</div>';
+     }
+     ?>
+     <?php
+        	
+			$attributes = array('name' => 'stockinmaster', 'id' => 'stockinmaster');	   
+	  		echo form_open('stockinmaster/addStockinmaster' , $attributes);
+
+			
+
+       ?>
+                        
+                        <div class="displa_table">
+                            <table class="table table-bordered table-striped" id="smpl_tbl" style="border:none">
+								
+								<tbody>
+									<tr style="border:none; background-color:#FFF;"> <td><div class="row-fluid"><label>Material Name<span class="f_req">*</span></label>
+
+<select name="materialId"id="materialId">
+<option value="">Select material</option>
+<?php
+$a=count($materialName);
+			if($a>0){
+		foreach($materialName as $row){
+
+?>
+<option value="<?php echo $row->id; ?>"><?php echo $row->materialName; ?></option>
+<?php
+}
+}
+ ?>
+</select>
+
+                                       </div></td>
+			<td><div class="row-fluid"><label>Cost<span class="f_req">*</span></label>
+                                           <?php $atts = array(
+													  'name' => 'cost',
+													  'id'   => 'cost',
+													  'size' => 50
+													  
+													  
+										   ); ?>
+                                             <?php echo form_input($atts); ?>
+										<td><div class="row-fluid" id="vehicleType"><label>Vendor Name<span class="f_req">*</span></label>
+
+<select name="vendorId"id="vendorId">
+<option value="">Select Vendor</option>
+<?php
+$a=count($vendorName);
+			if($a>0){
+		foreach($vendorName as $row){
+
+?>
+<option value="<?php echo $row->id; ?>"><?php echo $row->vendor_name; ?></option>
+<?php
+}
+}
+ ?>
+</select>
+                                        </div></td>
+</tr>
+
+						<tr style="border:none; background-color:#FFF;">
+				
+		  
+
+
+                                        <td><div class="row-fluid"><label>Quantity<span class="f_req">*</span></label>
+                                       <?php $atts = array(
+													
+													  'name' => 'quantity',
+													  'id'   => 'quantity',
+													  'size' => 35
+													
+										   ); ?>
+                                             <?php echo form_input($atts); ?>
+                                        </div></td>
+									
+									
+										<td><div class="row-fluid"><label>Stroage Loc<span class="f_req">*</span></label>
+                                        <?php $atts = array(
+													  'name' => 'storageLoc',
+													  'id'   => 'storageLoc',
+													  'size' => 50
+													   
+										   ); ?>
+						                    <?php echo form_input($atts); ?>
+                                        </div></td>
+
+		<td><div class="row-fluid"><label>Balance<span class="f_req">*</span></label>
+                                       <?php $atts = array(
+													
+													  'name' => 'balance',
+													  'id'   => 'balance',
+													'readonly' =>'true',	
+													  'size' => 35
+													
+										   ); ?>
+                                             <?php echo form_input($atts); ?>
+                                        </div></td>
+                                        
+										</tr>
+									
+                                    <tr>
+											<td rowspan="3">
+                                               <?php  
+
+               $atts = array(
+
+               'name' => 'submit',
+
+               'value'   => 'Submit',
+
+               'class' => "btn btn-inverse",
+
+             );
+
+            echo form_submit($atts);
+
+            ?>
+
+            <?php
+
+            $atts = array(
+
+               'name' => 'cancel',
+
+               'value'   => 'Cancel',
+
+               'class' => "btn btn-inverse",
+
+             );
+            echo form_reset($atts); ?>
+                                     	   </td>
+									</tr>
+                                    
+								</tbody>
+							</table>
+                        
+                        </div>
+                    <div class="displa_table">
+                            <table class="table table-bordered table-striped" id="smpl_tbl">
+								<thead>
+									<tr>
+										
+										<th>S.No</th>
+                                        <th>Material Id</th>
+										<th>Vendor Id</th>
+										<th>Quantity</th>
+                                        <th>Cost</th>
+                                        <th>Stroage Loc</th>
+                                        																						
+										<th>Edit</th>
+									</tr>
+								</thead>
+								<tbody>
+                                <?php
+								$sno = 0;
+								
+								$a=count($records);
+								if ($a>0){
+								foreach($records as $row){
+									$sno = $sno + 1;
+								 ?>
+									<tr>
+										<td><?php echo $sno; ?> </td>
+										<td><?php echo $row['materialName'] ; ?></td>
+										
+                                        <td><?php echo $row['vendorId']; ?></td>
+                                        <td><?php echo $row['quantity']; ?></td>
+                                        
+                                        <td><?php echo $row['cost']; ?></td>
+                                        <td><?php echo $row['storageLoc']; ?></td>
+                                        
+											
+                                    
+
+<td><a href="<?php echo base_url(); ?>/index.php?stockinmaster/editStockinmaster/<?php echo $row['id']; ?>" class="sepV_a" title="Edit"><i class="icon-pencil"></i></a>
+				
+									</tr>
+								<?php }} ?>	
+								</tbody>
+							</table>
+                      <p><?php echo $links; ?></p>
+                        </div>
+                    </div>
+                        
+                </div>
+                
+            </div>
+            
+		<?php include("includes/sidebar.php"); ?>	
+
